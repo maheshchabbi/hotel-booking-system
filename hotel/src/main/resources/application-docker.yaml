@@ -8,9 +8,9 @@ spring:
     location: classpath:banner.txt
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://hb-mysql-hotel:3306/hotel
-    username: root
-    password: password
+    url: jdbc:mysql:/hotel.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/hotel?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: admin
+    password: maheshchabbi
   jpa:
     hibernate:
       ddl-auto: update #create-drop #update

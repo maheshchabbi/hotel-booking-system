@@ -13,17 +13,21 @@ import com.dlim2012.searchconsumer.repository.HotelRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.modelmapper.ModelMapper;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -33,130 +37,144 @@ public class IndexingService {
 
     private final DateService dateService;
     private final PriceService priceService;
-
     private final HotelRepository hotelRepository;
-
-//    private final RestHighLevelClient client = new RestHighLevelClient(
-//            RestClient.builder(
-//                    new HttpHost("10.0.0.110", 9103, "http")
-//            )
-//    );
-
     private final ElasticSearchUtils elasticSearchUtils;
+    private final RestHighLevelClient restHighLevelClient;
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper = new ModelMapper();
     private final Random random = new Random();
-
     private final Integer NUM_RETRY_UPDATE = 2;
 
+    /**
+     * Fetch hotel data from OpenSearch
+     */
+    private Hotel getHotelById(String hotelId) throws IOException {
+        GetRequest getRequest = new GetRequest("hotel", hotelId);
+        GetResponse getResponse = restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);
+        if (!getResponse.isExists()) {
+            throw new ResourceNotFoundException("Hotel ID " + hotelId + " not found in OpenSearch.");
+        }
+        return objectMapper.readValue(getResponse.getSourceAsBytes(), Hotel.class);
+    }
+
+    /**
+     * Save hotel data to OpenSearch
+     */
+    private void saveHotel(Hotel hotel) throws IOException {
+        IndexRequest indexRequest = new IndexRequest("hotel")
+                .id(hotel.getId())
+                .source(objectMapper.convertValue(hotel, Map.class));
+        IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+        log.info("Saved hotel with ID: {}", response.getId());
+    }
+
+    /**
+     * Save or update a hotel in OpenSearch
+     */
     public Hotel saveHotel(HotelSearchDetails hotelDetails) throws IOException, InterruptedException {
+        Hotel hotel = modelMapper.map(hotelDetails, Hotel.class);
+        hotel.setId(hotelDetails.getId().toString());
+        hotel.setFacility(hotelDetails.getFacility().stream()
+                .map(dto -> Facility.builder().id(dto.getId()).build())
+                .toList());
+        hotel.setRooms(new ArrayList<>());
+        hotel.setGeoPoint(new GeoPoint(hotelDetails.getLatitude(), hotelDetails.getLongitude()));
 
-        if (hotelDetails.getCreateNew()) {
-            Hotel hotel = modelMapper.map(hotelDetails, Hotel.class);
-            hotel.setId(hotelDetails.getId().toString());
-
-            hotel.setFacility(hotelDetails.getFacility().stream()
-                    .map(dto -> Facility.builder().id(dto.getId()).build()).toList()
-            );
-
-            hotel.setRooms(new ArrayList<>());
-            hotel.setGeoPoint(new GeoPoint(hotelDetails.getLatitude(), hotelDetails.getLongitude()));
-
-            hotel = hotelRepository.save(hotel);
-
-            log.info("Hotel {} saved.", hotel.getId());
-
-//            SearchRequest searchRequest = new SearchRequest("hotel");
-//            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-//            searchRequest.source(searchSourceBuilder);
-//            SearchResponse searchResponse1 = client.search(searchRequest, RequestOptions.DEFAULT);
-//            System.out.println(searchResponse1);
-//            System.out.println(searchResponse1.getHits().getTotalHits());
-//            System.out.println(searchResponse1.getHits().getHits());
-            return hotel;
-        } else {
-            for (int i=0; i<NUM_RETRY_UPDATE; i++){
-                try {
-                    Hotel hotel = hotelRepository.findById(hotelDetails.getId().toString())
-                            .orElseThrow(() -> new ResourceNotFoundException("Hotel {} not found while updateing."));
-                    hotel.setId(hotelDetails.getId().toString());
-                    hotel.setName(hotelDetails.getName());
-                    hotel.setPropertyTypeOrdinal(hotelDetails.getPropertyTypeOrdinal().toString());
-                    hotel.setNeighborhood(hotelDetails.getNeighborhood());
-                    hotel.setZipcode(hotelDetails.getZipcode());
-                    hotel.setCity(hotelDetails.getCity());
-                    hotel.setState(hotelDetails.getState());
-                    hotel.setCountry(hotelDetails.getCountry());
-                    hotel.setGeoPoint(new GeoPoint(hotelDetails.getLatitude(), hotelDetails.getLongitude()));
-                    hotel.setPropertyRating(hotelDetails.getPropertyRating());
-
-                    hotel.setFacility(hotelDetails.getFacility().stream()
-                            .map(dto -> Facility.builder().id(dto.getId()).build()).toList()
-                    );
-                    hotel = hotelRepository.save(hotel);
-                    return hotel;
-
-                } catch (ResourceNotFoundException | OptimisticLockingFailureException e){
-                    log.error(e.getMessage());
-                } catch (Exception e){
-                    log.error(e.getMessage());
-                    return null;
-                }
-                TimeUnit.MILLISECONDS.sleep((long) (random.nextDouble() * 1000));
-            }
-            log.error("Update of hotel {} failed after {} retries.", hotelDetails.getId(), NUM_RETRY_UPDATE);
-            // todo: update hotel
-            return null;
-        }
+        saveHotel(hotel);
+        return hotel;
     }
 
+    /**
+     * Update an existing hotel in OpenSearch
+     */
+    public Hotel updateHotel(HotelSearchDetails hotelDetails) throws IOException, InterruptedException {
+        for (int i = 0; i < NUM_RETRY_UPDATE; i++) {
+            try {
+                Hotel hotel = getHotelById(hotelDetails.getId().toString());
+
+                hotel.setName(hotelDetails.getName());
+                hotel.setPropertyTypeOrdinal(hotelDetails.getPropertyTypeOrdinal().toString());
+                hotel.setNeighborhood(hotelDetails.getNeighborhood());
+                hotel.setZipcode(hotelDetails.getZipcode());
+                hotel.setCity(hotelDetails.getCity());
+                hotel.setState(hotelDetails.getState());
+                hotel.setCountry(hotelDetails.getCountry());
+                hotel.setGeoPoint(new GeoPoint(hotelDetails.getLatitude(), hotelDetails.getLongitude()));
+                hotel.setPropertyRating(hotelDetails.getPropertyRating());
+                hotel.setFacility(hotelDetails.getFacility().stream()
+                        .map(dto -> Facility.builder().id(dto.getId()).build())
+                        .toList());
+
+                saveHotel(hotel);
+                return hotel;
+            } catch (ResourceNotFoundException e) {
+                log.error(e.getMessage());
+                return null;
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                return null;
+            }
+            TimeUnit.MILLISECONDS.sleep((long) (random.nextDouble() * 1000));
+        }
+        log.error("Update of hotel {} failed after {} retries.", hotelDetails.getId(), NUM_RETRY_UPDATE);
+        return null;
+    }
+
+    /**
+     * Delete a hotel from OpenSearch
+     */
     public void delete(HotelSearchDeleteRequest request) {
-        hotelRepository.deleteById(request.getHotelId().toString());
+        try {
+            DeleteRequest deleteRequest = new DeleteRequest("hotel", request.getHotelId().toString());
+            DeleteResponse response = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            if (response.getResult().toString().equals("DELETED")) {
+                log.info("Deleted hotel with ID: {}", request.getHotelId());
+            } else {
+                log.warn("Hotel ID {} not found for deletion.", request.getHotelId());
+            }
+        } catch (IOException e) {
+            log.error("Error deleting hotel ID {}: {}", request.getHotelId(), e.getMessage());
+        }
     }
 
-    /* bulk update dates and price */
+    /**
+     * Bulk update hotels, prices, and dates in OpenSearch
+     */
     public void bulkUpdate(HotelsNewDayDetails request) throws InterruptedException {
-        Set<Hotel> hotelList = hotelRepository.findByIdBetween(request.getStartId(), request.getEndId()-1);
-
-
         Integer today = elasticSearchUtils.toInteger(LocalDate.now());
-        for (int i=0; i<NUM_RETRY_UPDATE; i++){
-            try{
-                for (Hotel hotel: hotelList){
 
-                    if (hotel.getSeqNoPrimaryTerm() == null){
-                        log.error("Hotel {} found without SeqNoPrimaryTerm", hotel.getId());
-                    }
+        for (int i = 0; i < NUM_RETRY_UPDATE; i++) {
+            try {
+                for (int hotelId = request.getStartId(); hotelId < request.getEndId(); hotelId++) {
+                    try {
+                        Hotel hotel = getHotelById(String.valueOf(hotelId));
 
-                    Integer hotelId = Integer.valueOf(hotel.getId());
-
-                    DatesUpdateDetails details = request
-                            .getDatesUpdateDetailsMap()
-                            .getOrDefault(hotelId, null);
-                    if (details != null){
-                        dateService.updateHotelDates(hotel, details);
-                    }
-
-                    List<PriceUpdateDetails> priceUpdateDetailsList = request.getPriceUpdateDetailsMap().getOrDefault(hotelId, null);
-                    if (priceUpdateDetailsList == null){
-                        for (PriceUpdateDetails priceUpdateDetails: priceUpdateDetailsList) {
-                            priceService.updateHotelPrices(hotel, priceUpdateDetails);
+                        // Update dates
+                        DatesUpdateDetails dateDetails = request.getDatesUpdateDetailsMap().getOrDefault(hotelId, null);
+                        if (dateDetails != null) {
+                            dateService.updateHotelDates(hotel, dateDetails);
                         }
+
+                        // Update prices
+                        List<PriceUpdateDetails> priceDetailsList = request.getPriceUpdateDetailsMap().getOrDefault(hotelId, null);
+                        if (priceDetailsList != null) {
+                            for (PriceUpdateDetails priceDetails : priceDetailsList) {
+                                priceService.updateHotelPrices(hotel, priceDetails);
+                            }
+                        }
+
+                        // Save updated hotel data
+                        saveHotel(hotel);
+                    } catch (Exception e) {
+                        log.error("Error processing hotel ID {}: {}", hotelId, e.getMessage());
                     }
-
-
                 }
-                hotelRepository.saveAll(hotelList);
                 return;
-            } catch (OptimisticLockingFailureException | ResourceNotFoundException e){
-                log.error(e.getMessage());
+            } catch (Exception e) {
+                log.error("Bulk update failed: {}", e.getMessage());
                 TimeUnit.MILLISECONDS.sleep((long) (random.nextDouble() * 1000));
-            } catch (Exception e){
-                log.error(e.getMessage());
-                return;
             }
         }
-        log.error("Updating dates for hotel {} ~ {} failed after {} retries.", request.getStartId(), request.getEndId(), NUM_RETRY_UPDATE);
+        log.error("Updating hotels {} ~ {} failed after {} retries.", request.getStartId(), request.getEndId(), NUM_RETRY_UPDATE);
     }
 }

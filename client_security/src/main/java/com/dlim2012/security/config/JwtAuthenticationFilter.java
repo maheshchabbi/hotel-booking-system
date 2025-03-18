@@ -27,52 +27,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtDecoder jwtDecoder;
 
     @Override
-    protected void doFilterInternal(
-        @NonNull HttpServletRequest httpServletRequest,
-        @NonNull HttpServletResponse httpServletResponse,
-        @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
-
-
-        final String authHeader = httpServletRequest.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
-
-
         String jwtToken = authHeader.substring(7);
-//        System.out.println("jwtToken: " + jwtToken);
         Jwt jwt;
         try {
             jwt = jwtDecoder.decode(jwtToken);
-        } catch (Exception e){
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
             return;
         }
-
-        String[] scopes = ((String) jwt.getClaims().get("scope")).split(" ");
-
-        // set scopes in authentication
+        // Safely check the "scope" claim.
+        String scopeClaim = (String) jwt.getClaims().get("scope");
+        if (scopeClaim == null || scopeClaim.isBlank()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        String[] scopes = scopeClaim.split(" ");
         Authentication authentication = new JwtAuthenticationToken(
                 jwt,
-                Arrays.stream(scopes).map(SimpleGrantedAuthority::new).toList()
-                );
-        authentication.setAuthenticated(true);
+                Arrays.stream(scopes)
+                      .map(SimpleGrantedAuthority::new)
+                      .toList());
+        // Set authentication in the context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-//        filterChain.doFilter(httpServletRequest, httpServletResponse);
-
-        // continue only if a scope is allowed
-
-        for (String role: scopes){
-            if (roles.hasRole(role)){
-                filterChain.doFilter(httpServletRequest, httpServletResponse);
-//                System.out.println("jwt authenticated...");
+        
+        // Continue the filter chain only if one of the roles is allowed.
+        for (String role : scopes) {
+            if (roles.hasRole(role)) {
+                filterChain.doFilter(request, response);
                 return;
             }
         }
         System.out.println("jwt authentication null");
         SecurityContextHolder.getContext().setAuthentication(null);
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(request, response);
     }
 }

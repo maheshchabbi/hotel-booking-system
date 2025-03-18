@@ -24,14 +24,5 @@ eureka:
 
 custom:
   elasticsearch:
-    host: hb-elasticsearch
-    port: 9200
-    username: elastic
-    password: changeme
-    useSsl: false
-  security:
-    rsa:
-      public-key: classpath:certs/public.pem
-    roles:
-      - ADMIN
-      - APP_USER
+    host: search-hotel1-nzonzgcx4dksqjda333y5txcsu.ap-south-1.es.amazonaws.com
+    useSsl: true

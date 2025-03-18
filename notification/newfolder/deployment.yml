@@ -1,0 +1,16 @@
+apiVersion: app/V1
+kind: Deployment
+metadata:
+  name: demo
+spec:
+  replicas: 2
+  matchLabels:
+    app: nginx
+  template:
+    label:
+      name: nginx
+  spec:
+    container: nginx
+    ports:
+      - port: 80
+    

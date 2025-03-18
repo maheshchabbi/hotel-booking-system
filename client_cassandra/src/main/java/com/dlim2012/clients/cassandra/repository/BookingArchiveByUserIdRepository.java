@@ -10,12 +10,12 @@ import java.util.List;
 
 @Repository
 public interface BookingArchiveByUserIdRepository
-        extends CassandraRepository<BookingArchiveByUserId, Integer> {
+        extends CassandraRepository<BookingArchiveByUserId, String> {  // Ensure correct ID type
 
+    // Query must include the partition key (userId) for AWS Keyspaces performance
     List<BookingArchiveByUserId> findByUserIdAndMainStatusAndEndDateTimeGreaterThanEqual(
-            Integer userId, BookingMainStatus mainStatus, LocalDateTime startDateTime);
+            String userId, BookingMainStatus mainStatus, LocalDateTime startDateTime);
 
     List<BookingArchiveByUserId> findByUserIdAndMainStatusAndEndDateTimeGreaterThanEqualAndEndDateTimeLessThan(
-            Integer userId, BookingMainStatus mainStatus, LocalDateTime startDateTime, LocalDateTime endDateTime);
-
+            String userId, BookingMainStatus mainStatus, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

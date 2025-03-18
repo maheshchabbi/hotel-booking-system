@@ -7,6 +7,8 @@
         <groupId>com.dlim2012</groupId>
         <artifactId>hotelbooking</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <!-- Adjust relativePath if necessary -->
+        <relativePath>../hotelbooking/pom.xml</relativePath>
     </parent>
 
     <artifactId>client_security</artifactId>
@@ -18,19 +20,30 @@
     </properties>
 
     <dependencies>
+        <!-- Lombok for annotations -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Enable configuration processing for @ConfigurationProperties -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- OAuth2 Authorization Server -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
         </dependency>
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <!-- Spring Security Test -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>

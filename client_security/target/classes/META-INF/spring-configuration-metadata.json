@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "custom.security",
+      "type": "com.dlim2012.security.dto.Roles",
+      "sourceType": "com.dlim2012.security.dto.Roles"
+    },
+    {
+      "name": "custom.security.rsa",
+      "type": "com.dlim2012.security.dto.PublicKey",
+      "sourceType": "com.dlim2012.security.dto.PublicKey"
+    }
+  ],
+  "properties": [
+    {
+      "name": "custom.security.roles",
+      "type": "java.util.HashSet<java.lang.String>",
+      "sourceType": "com.dlim2012.security.dto.Roles"
+    },
+    {
+      "name": "custom.security.rsa.public-key",
+      "type": "java.security.interfaces.RSAPublicKey",
+      "sourceType": "com.dlim2012.security.dto.PublicKey"
+    }
+  ],
+  "hints": []
+}

@@ -7,7 +7,7 @@ import ProgressBar from "./ProgressBar";
 import {center_init, hotelFacilities} from "../../../../../assets/Lists";
 import {postWithJwt} from "../../../../../clients";
 import {useNavigate} from "react-router-dom";
-import './hotelRegister.css'
+import './HotelRegister.css'
 import MailList from "../../../../../components/mailList/MailList";
 import Footer from "../../../../../components/footer/Footer";
 import {validateEmail} from "../../utils/inputValidation";

@@ -14,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "booking_rooms")
+@ToString(exclude = {"booking", "bookingRoomList"})
 public class BookingRooms implements Serializable {
 
     @Id
@@ -23,7 +24,7 @@ public class BookingRooms implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
+    private Booking booking; // Ensure Booking class has a public getId() method (see below)
 
     @Column(name = "rooms_id", nullable = false)
     private Integer roomsId;
@@ -46,12 +47,16 @@ public class BookingRooms implements Serializable {
     @OneToMany(mappedBy = "bookingRooms", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<BookingRoom> bookingRoomList;
 
+    // Helper method to safely get booking's id
+    public String getBookingIdString() {
+        return (booking != null && booking.getId() != null) ? booking.getId().toString() : "null";
+    }
 
     @Override
     public String toString() {
         return "BookingRooms{" +
                 "id=" + id +
-                ", booking=" + (booking == null ? null : booking.getId()) +
+                ", bookingId=" + getBookingIdString() +
                 ", roomsId=" + roomsId +
                 ", roomsDisplayName='" + roomsDisplayName + '\'' +
                 ", roomsShortName='" + roomsShortName + '\'' +

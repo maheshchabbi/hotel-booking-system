@@ -1,14 +1,11 @@
 package com.dlim2012.clients.cassandra.entity;
 
-import com.dlim2012.clients.entity.BookingMainStatus;
-import com.dlim2012.clients.entity.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.Frozen;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -21,11 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 @Table(value = "booking_archive_by_hotel_id")
 public class BookingArchiveByHotelId {
+    
     @PrimaryKeyColumn(name = "hotel_id", type = PrimaryKeyType.PARTITIONED)
     private Integer hotelId;
 
+    // Changed from enum to String for compatibility with AWS Keyspaces
     @PrimaryKeyColumn(name = "main_status", type = PrimaryKeyType.CLUSTERED)
-    private BookingMainStatus mainStatus;
+    private String mainStatus;
 
     @PrimaryKeyColumn(name = "end_date_time", type = PrimaryKeyType.CLUSTERED)
     private LocalDateTime endDateTime;
@@ -66,11 +65,13 @@ public class BookingArchiveByHotelId {
     @Column(value = "country")
     private String country;
 
+    // Using a list of strings for room details (alternative: list of a UDT, see below)
     @Column(value = "rooms")
-    private List<@Frozen BookingArchiveRoom> rooms;
+    private List<String> rooms;
 
+    // Changed from enum to String for compatibility with AWS Keyspaces
     @Column(value = "status")
-    private BookingStatus status;
+    private String status;
 
     @Column(value = "start_date_time")
     private LocalDateTime startDateTime;
@@ -83,7 +84,4 @@ public class BookingArchiveByHotelId {
 
     @Column(value = "invoice_confirm_time")
     private LocalDateTime invoiceConfirmTime;
-
-
-
 }

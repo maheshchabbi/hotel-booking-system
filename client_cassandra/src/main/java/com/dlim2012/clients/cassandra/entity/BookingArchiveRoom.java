@@ -13,32 +13,27 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@Table(value = "booking_archive_rooms")
-@UserDefinedType(value = "booking_archive_room")
+@UserDefinedType("booking_archive_room")
 public class BookingArchiveRoom {
 
-    @CassandraType(type = CassandraType.Name.INT, userTypeName = "roomsId")
+    @CassandraType(type = CassandraType.Name.INT)
     private Integer roomsId;
 
-//    @Column(value = "room")
-//    private List<@Frozen BookingArchiveRoom> room;
-
-    @CassandraType(type = CassandraType.Name.TEXT, userTypeName = "roomsName")
+    @CassandraType(type = CassandraType.Name.TEXT)
     private String roomsName;
 
-    @CassandraType(type = CassandraType.Name.BIGINT, userTypeName = "roomId")
+    @CassandraType(type = CassandraType.Name.BIGINT)
     private Long roomId;
 
-    @CassandraType(type = CassandraType.Name.TIMESTAMP, userTypeName = "startDateTime")
+    @CassandraType(type = CassandraType.Name.TIMESTAMP)
     private LocalDateTime startDateTime;
 
-    @CassandraType(type = CassandraType.Name.TIMESTAMP, userTypeName = "endDateTime")
+    @CassandraType(type = CassandraType.Name.TIMESTAMP)
     private LocalDateTime endDateTime;
 
-
-    @CassandraType(type = CassandraType.Name.TEXT, userTypeName = "guestName")
+    @CassandraType(type = CassandraType.Name.TEXT)
     private String guestName;
 
-    @CassandraType(type = CassandraType.Name.TEXT, userTypeName = "guestEmail")
+    @CassandraType(type = CassandraType.Name.TEXT)
     private String guestEmail;
 }

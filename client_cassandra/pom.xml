@@ -2,35 +2,66 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.dlim2012</groupId>
-        <artifactId>hotelbooking</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>com.dlim2012</groupId>
+    <artifactId>hotelbooking</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>client_cassandra</artifactId>
+  <artifactId>client_cassandra</artifactId>
 
-    <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-cassandra</artifactId>
-            </dependency>
-        <dependency>
-            <groupId>com.dlim2012</groupId>
-            <artifactId>clients</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
-
+  <properties>
+    <maven.compiler.source>19</maven.compiler.source>
+    <maven.compiler.target>19</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+    <!-- Spring Boot Cassandra Starter -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-cassandra</artifactId>
+    </dependency>
+    
+    <!-- Internal Clients Module -->
+    <dependency>
+      <groupId>com.dlim2012</groupId>
+      <artifactId>clients</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <!-- Lombok for boilerplate reduction -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+    
+    <!-- Amazon Keyspaces SigV4 Authentication Dependency -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>amazon-cassandra-sigv4-auth</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    
+    <!-- AWS SDK for Java v2 Auth Module -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>auth</artifactId>
+      <version>2.20.0</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <!-- Spring Boot Maven Plugin -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
