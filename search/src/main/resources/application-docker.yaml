@@ -24,5 +24,8 @@ eureka:
 
 custom:
   elasticsearch:
-    host: search-hotel1-nzonzgcx4dksqjda333y5txcsu.ap-south-1.es.amazonaws.com
+    host: search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
+    port: 443
     useSsl: true
+    username: admin
+    password: Adminisgr8*

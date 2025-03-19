@@ -9,7 +9,7 @@ services:
  ##     - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "9002:9002"
-    restart: unless-stopped
+    #restart: unless-stopped
     depends_on:
       - hb-eureka-server
       - hb-frontend
@@ -21,7 +21,7 @@ services:
  ##   build: ./eureka-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    restart: unless-stopped
+    #restart: unless-stopped
     ports:
       - "9200:9200"
 
@@ -31,19 +31,19 @@ services:
  ##   build: ./eureka-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    restart: unless-stopped
+    #restart: unless-stopped
     ports:
       - "3000:3000"
 
   hb-apigw:
-    image: maheshchabbi/hb.apigw
+    image: maheshchabbi/hb.apigw:latest
     container_name: hb-apigw
-    build: ./apigw
+    #build: ./apigw
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "9000:9000"
-    restart: unless-stopped
+    #restart: unless-stopped
     depends_on:
       - hb-eureka-server
 
@@ -78,9 +78,66 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
 
-  hb-zipkin:
-    image: openzipkin/zipkin
-    container_name: hb-zipkin
-    restart: unless-stopped
+  hb-archival:
+    image: maheshchabbi/hb.archival:latest
+    container_name: hb-archival
+    #build: ./archival
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     ports:
-      - "9201:9411"
+      - "9004:9004"
+    #restart: unless-stopped
+    depends_on:
+      - hb-eureka-server
+      - hb-broker
+
+  hb-booking:
+    image: maheshchabbi/hb.booking:latest
+    container_name: hb-booking
+    #build: ./booking
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "9003:9003"
+    #restart: unless-stopped
+    depends_on:
+      - hb-eureka-server
+      - hb-broker
+
+  hb-booking-management:
+    image: maheshchabbi/hb.bookingmangement:latest
+    container_name: hb-booking-management
+    #build: ./booking-management
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "9005:9005"
+    #restart: unless-stopped
+    depends_on:
+      - hb-eureka-server
+
+
+  hb-hotel:
+    image: maheshchabbi/hb.hotel:latest
+    container_name: hb-hotel
+    #build: ./hotel
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "9001:9001"
+    #restart: unless-stopped
+    depends_on:
+      - hb-eureka-server
+
+
+  hb-search:
+    image: maheshchabbi/hb.search:latest
+    container_name: hb-search
+    #build: ./search
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "9007:9007"
+    #restart: unless-stopped
+    depends_on:
+      - hb-eureka-server
