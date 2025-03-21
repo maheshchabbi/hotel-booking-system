@@ -14,9 +14,9 @@ import com.dlim2012.search.service.SearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,50 +30,40 @@ public class SearchController {
     private final CountHotelService countHotelService;
 
     @GetMapping("/test")
-    public String test(){
-        return "Test";
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Test endpoint is working.");
     }
 
-    @PostMapping(path = "/hotel")
-    HotelSearchResponse searchHotel(@RequestBody @Valid HotelSearchRequest hotelSearchRequest) throws IOException {
-//        log.info("Search requested: {}", hotelSearchRequest);
-        log.info("Search requested");
-//        System.out.println(hotelSearchRequest);
-        return searchService.search(hotelSearchRequest);
+    @PostMapping("/hotel")
+    public ResponseEntity<HotelSearchResponse> searchHotel(@RequestBody @Valid HotelSearchRequest hotelSearchRequest) {
+        log.info("Hotel search requested.");
+        return ResponseEntity.ok(searchService.search(hotelSearchRequest));
     }
 
-    @PostMapping(path = "/price")
-    List<PriceAggResponse> aggPrice(@RequestBody PriceAggRequest request) throws IOException {
-        log.info("Price aggregation requested: {}", request);
-        return searchService.aggPrice(request);
+    @PostMapping("/price")
+    public ResponseEntity<List<PriceAggResponse>> aggPrice(@RequestBody PriceAggRequest request) {
+        log.info("Price aggregation requested.");
+        return ResponseEntity.ok(searchService.aggPrice(request));
     }
 
-    @PostMapping(path = "/hotel/{hotelId}/availability")
-    RoomsAvailabilityResponse getRoomsAvailability(
+    @PostMapping("/hotel/{hotelId}/availability")
+    public ResponseEntity<RoomsAvailabilityResponse> getRoomsAvailability(
             @PathVariable("hotelId") Integer hotelId,
-            @RequestBody RoomsAvailabilityRequest request
-            ) throws IOException {
-        return searchService.getRoomsAvailability(hotelId, request);
+            @RequestBody RoomsAvailabilityRequest request) {
+        log.info("Checking availability for hotel ID: {}", hotelId);
+        return ResponseEntity.ok(searchService.getRoomsAvailability(hotelId, request));
     }
 
-    @PostMapping(path = "/count/city")
-    List<NumberResponse> numHotelByCity(
-            @RequestBody List<NumberByCityRequest> request
-            ) throws IOException {
-        return countHotelService.numHotelByCity(request);
+    @PostMapping("/count/city")
+    public ResponseEntity<List<NumberResponse>> numHotelByCity(@RequestBody List<NumberByCityRequest> request) {
+        log.info("Counting hotels by city.");
+        return ResponseEntity.ok(countHotelService.numHotelByCity(request));
     }
 
-    @PostMapping(path = "/count/property-type")
-    List<NumberResponse> numHotelByPropertyType(
-            @RequestBody List<NumberByPropertyTypeRequest> request
-            ) throws IOException {
-        return countHotelService.numHotelByPropertyType(request);
+    @PostMapping("/count/property-type")
+    public ResponseEntity<List<NumberResponse>> numHotelByPropertyType(@RequestBody List<NumberByPropertyTypeRequest> request) {
+        log.info("Counting hotels by property type.");
+        return ResponseEntity.ok(countHotelService.numHotelByPropertyType(request));
     }
-
-//    @PostMapping(path = "/city")
-//    public void searchHotelByCity(
-//
-//    ){
-//    }
-
 }
+
