@@ -10,6 +10,12 @@ spring:
   zipkin:
     base-url: http://hb-zipkin:9411
 
+  data:
+    cassandra:
+      contact-points: hb-cassandra
+      port: 9042
+      keyspace-name: hotel_booking
+
 eureka:
   instance:
     hostname: hb-eureka-server
@@ -24,14 +30,8 @@ eureka:
 
 custom:
   elasticsearch:
-    host: hb-elasticsearch
-    port: 9200
-    username: elastic
-    password: changeme
-    useSsl: false
-  security:
-    rsa:
-      public-key: classpath:certs/public.pem
-    roles:
-      - ADMIN
-      - APP_USER
+    host: search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
+    port: 443
+    useSsl: true
+    username: admin
+    password: Adminisgr8*
