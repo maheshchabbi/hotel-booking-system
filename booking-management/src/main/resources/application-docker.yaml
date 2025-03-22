@@ -9,12 +9,13 @@ spring:
     location: classpath:banner.txt
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://hb-mysql-booking:3306/booking # ?createDatabaseIfNotExist=true
-    username: root
-    password: password
+    # Using the AWS RDS endpoint for MySQL
+    url: jdbc:mysql://booking.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/booking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: admin
+    password: maheshchabbi
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # For testing; consider using migrations in production.
     show-sql: false
     properties:
       hibernate:
@@ -25,7 +26,6 @@ spring:
   sql:
     init:
       mode: always
-
   data:
     cassandra:
       port: 9042
@@ -70,6 +70,6 @@ custom:
       - HOTEL_MANAGER
       - APP_USER
   redis:
-    host: hb-redis
+    host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com:6379
     port: 6379
   gateway: "http://10.0.0.110:9000"
