@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NumberByPropertyTypeRequest {
-    String propertyType;
+    private String propertyType;
 }
+

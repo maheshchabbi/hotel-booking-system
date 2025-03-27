@@ -16,39 +16,44 @@ import java.util.List;
 @NoArgsConstructor
 public class HotelSearchRequest {
 
-    Boolean useRecommended;
+    private Boolean useRecommended;
 
-    // address
-    String city;
-    String state;
-    String country;
-    Double latitude;
-    Double longitude;
+    // Address fields
+    private String city;
+    private String state;
+    private String country;
+    private Double latitude;
+    private Double longitude;
 
-    // dates
+    // Date fields
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate startDate;
+    private LocalDate startDate;
+    
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate endDate;
+    private LocalDate endDate;
 
-    // size
+    // Size fields
     @NotNull
-    Integer numAdult;
+    private Integer numAdult;
+    
     @NotNull
-    Integer numChild;
-    Integer numBed;
+    private Integer numChild;
+    
+    private Integer numBed;
+    
     @NotNull
-    Integer numRoom;
+    private Integer numRoom;
 
-    // price
-    Long priceMin;
-    Long priceMax;
+    // Price fields
+    private Long priceMin;
+    private Long priceMax;
 
-    // filters
-    List<String> propertyTypes;
-    List<Integer> propertyRating;
-    List<String> hotelFacility;
-    List<String> roomsFacility;
+    // Filters
+    private List<String> propertyTypes;
+    private List<Integer> propertyRating;
+    private List<String> hotelFacility;
+    private List<String> roomsFacility;
 }
+

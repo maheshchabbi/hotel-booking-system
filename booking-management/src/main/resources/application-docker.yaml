@@ -70,6 +70,8 @@ custom:
       - HOTEL_MANAGER
       - APP_USER
   redis:
-    host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com:6379
+    host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com  # Updated AWS ElastiCache endpoint
     port: 6379
-  gateway: "http://10.0.0.110:9000"
+    time-to-live: 10000  # Cache expiry in milliseconds
+    cache-null-values: true
+  gateway: "http://hb-apigw:9000"

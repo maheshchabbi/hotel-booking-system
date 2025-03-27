@@ -8,12 +8,12 @@ spring:
     location: classpath:banner.txt
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://hb-mysql-user:3306/user?createDatabaseIfNotExist=true
-    username: root
-    password: password
+    url: jdbc:mysql://user.cp6qemaye14q.ap-south-1.rds.amazonaws.com/user?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: admin
+    password: maheshchabbi
   jpa:
     hibernate:
-      ddl-auto: create #create-drop #update
+      ddl-auto: update #create-drop #update
     show-sql: false
     properties:
       hibernate:
@@ -57,6 +57,6 @@ custom:
     jwt:
       expire-time-in-minutes: 43200 # 10 days
   gateway: # used to generate test user
-    hotel: http://10.0.0.110:9000
-    booking: http://10.0.0.110:9000
-    search: http://10.0.0.110:9000
+    hotel: http://hb-apigw:9000
+    booking: http://hb-apigw:9000
+    search: http://hb-apigw:9000

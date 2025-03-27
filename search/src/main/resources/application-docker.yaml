@@ -1,6 +1,5 @@
 server:
-  port:
-    9007
+  port: 9007
 
 spring:
   application:
@@ -21,8 +20,18 @@ eureka:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${eureka.instance.port}/eureka/
 
-
 custom:
+  build:
+    flavor: oss
   elasticsearch:
-    host: search-hotel1-nzonzgcx4dksqjda333y5txcsu.ap-south-1.es.amazonaws.com
+    host: search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
+    port: 443
     useSsl: true
+    username: admin
+    password: Adminisgr8*
+
+logging:
+  level:
+    org.elasticsearch: DEBUG
+    com.dlim2012.search: DEBUG
+

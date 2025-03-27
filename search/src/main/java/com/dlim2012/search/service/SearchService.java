@@ -27,38 +27,56 @@ public class SearchService {
 
     private final RestHighLevelClient restHighLevelClient;
 
-    // ✅ Fix for `search(HotelSearchRequest request)`
+    /**
+     * Executes a search query on the "hotel" index based on the city provided in the request.
+     * @param request A HotelSearchRequest containing search criteria.
+     * @return A HotelSearchResponse with the search results.
+     */
     public HotelSearchResponse search(HotelSearchRequest request) {
         try {
+            log.info("Starting search with request: {}", request);
+
+            // Build the search request for index "hotel"
             SearchRequest searchRequest = new SearchRequest("hotel");
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                     .query(QueryBuilders.matchQuery("city", request.getCity()));
             searchRequest.source(searchSourceBuilder);
 
+            // Execute the search request
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            log.info("Search results: {}", searchResponse.toString());
+            log.info("Search response: {}", searchResponse);
 
-            // Convert response to DTO
+            // TODO: Convert searchResponse into HotelSearchResponse DTO
             HotelSearchResponse response = new HotelSearchResponse();
-            // You may need to parse searchResponse and populate the DTO accordingly
+            // Populate response with the data from searchResponse as needed
+
             return response;
         } catch (IOException e) {
-            log.error("Search failed: {}", e.getMessage());
-            throw new RuntimeException("Search failed", e);
+            log.error("Error executing search: {}", e.getMessage(), e);
+            throw new RuntimeException("Search operation failed", e);
         }
     }
 
-    // ✅ Fix for `aggPrice(PriceAggRequest request)`
+    /**
+     * Performs price aggregation based on the provided request.
+     * @param request A PriceAggRequest containing aggregation parameters.
+     * @return A list of PriceAggResponse objects representing the aggregation result.
+     */
     public List<PriceAggResponse> aggPrice(PriceAggRequest request) {
-        log.info("Aggregating price: {}", request);
-        // Mock response - replace with actual logic
+        log.info("Aggregating price for request: {}", request);
+        // TODO: Implement actual aggregation logic
         return Collections.emptyList();
     }
 
-    // ✅ Fix for `getRoomsAvailability(Integer hotelId, RoomsAvailabilityRequest request)`
+    /**
+     * Checks room availability for a given hotel.
+     * @param hotelId The ID of the hotel.
+     * @param request A RoomsAvailabilityRequest containing room availability criteria.
+     * @return A RoomsAvailabilityResponse with availability information.
+     */
     public RoomsAvailabilityResponse getRoomsAvailability(Integer hotelId, RoomsAvailabilityRequest request) {
-        log.info("Checking room availability for hotel: {}", hotelId);
-        // Mock response - replace with actual logic
+        log.info("Getting room availability for hotel: {} with request: {}", hotelId, request);
+        // TODO: Implement actual room availability logic
         return new RoomsAvailabilityResponse();
     }
 }

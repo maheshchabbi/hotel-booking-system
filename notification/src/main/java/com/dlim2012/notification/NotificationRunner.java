@@ -14,7 +14,7 @@ public class NotificationRunner  implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         notificationService.sendMail(
-                "junghoonlim12@gmail.com",
+                "poojachougala03@gmail.com",
                 "Testing from Spring Boot",
                 "Hello World from Spring Boot Email"
         );
