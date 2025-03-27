@@ -12,13 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotelSearchRooms {
-    Integer roomsId;
-    String displayName;
-    Integer maxAdult;
-    Integer maxChild;
-    Integer numBed;
-    Integer recommended;
-    Integer quantity;
-    Long price;
-    List<BedInfo> bedInfoList;
+    private Integer roomsId;
+    private String displayName;
+    private Integer maxAdult;
+    private Integer maxChild;
+    private Integer numBed;
+    private Integer recommended;
+    private Integer quantity;
+    private Long price;
+    private List<BedInfo> bedInfoList;
 }
+

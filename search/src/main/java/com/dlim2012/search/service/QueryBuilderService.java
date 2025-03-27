@@ -98,3 +98,6 @@ public class QueryBuilderService {
             roomsNumRoomMap.put(roomsId, quantity);
         }
         return roomsNumRoomMap;
+    }
+}
+

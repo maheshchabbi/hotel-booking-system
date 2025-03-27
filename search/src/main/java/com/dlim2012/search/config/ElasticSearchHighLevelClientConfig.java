@@ -25,6 +25,12 @@ public class ElasticSearchHighLevelClientConfig {
     @Value("${custom.elasticsearch.host}")
     private String host;
 
+    @Value("${custom.elasticsearch.port}")
+    private int port;
+
+    @Value("${custom.elasticsearch.useSsl}")
+    private boolean useSsl;
+
     @Value("${custom.elasticsearch.username}")
     private String username;
 
@@ -33,41 +39,51 @@ public class ElasticSearchHighLevelClientConfig {
 
     @Bean
     public RestHighLevelClient restHighLevelClient() throws Exception {
-        // Create a credentials provider with your basic auth credentials
+        // Declare the credentials provider as final
         final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-        // Create an SSLContext that trusts all certificates (disables certificate validation)
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, new TrustManager[]{
-            new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    // Trust all client certificates
+        // Conditionally create an SSLContext if SSL is enabled, and declare it as final
+        final SSLContext sslContext;
+        if (useSsl) {
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                        // Trust all client certificates
+                    }
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                        // Trust all server certificates
+                    }
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
                 }
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    // Trust all server certificates
-                }
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-            }
-        }, new SecureRandom());
+            }, new SecureRandom());
+        } else {
+            sslContext = null;
+        }
 
-        // Build the REST client with HTTPS, credentials, and our custom SSL context
-        RestClientBuilder builder = RestClient.builder(new HttpHost(host, 443, "https"))
+        // Determine the scheme based on whether SSL is enabled
+        String scheme = useSsl ? "https" : "http";
+
+        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, scheme))
             .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
                 @Override
                 public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-                    return httpClientBuilder
-                        .setDefaultCredentialsProvider(credentialsProvider)
-                        .setSSLContext(sslContext)
-                        .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                    if (useSsl && sslContext != null) {
+                        httpClientBuilder.setSSLContext(sslContext)
+                                         .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+                    }
+                    return httpClientBuilder;
                 }
             });
 
         return new RestHighLevelClient(builder);
     }
 }
+

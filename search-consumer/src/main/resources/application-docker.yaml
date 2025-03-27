@@ -1,6 +1,5 @@
 server:
-  port:
-    9006
+  port: 9006
 
 spring:
   application:
@@ -11,6 +10,14 @@ spring:
     base-url: http://hb-zipkin:9411
   kafka:
     bootstrap-servers: hb-broker:9092
+  elasticsearch:
+    # Use HTTPS without specifying a port (443 is the default for HTTPS)
+    uris: https://search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
+    username: admin
+    password: Adminisgr8*
+    # Optional: adjust timeouts if necessary
+    connection-timeout: 5000
+    socket-timeout: 30000
 
 eureka:
   instance:
@@ -23,17 +30,18 @@ eureka:
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${eureka.instance.port}/eureka/
 
-
 logging:
   level:
     org:
       springframework:
         security: DEBUG
 
+# Optional: If you need these custom properties in your own code, you can still keep them.
 custom:
   elasticsearch:
-    server: hb-elasticsearch:9200
-    username: elastic
-    password: changeme
-    useSsl: false
+    server: search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
+    port: 443         # HTTPS typically runs on 443; no need to add to the URI if using HTTPS.
+    username: admin
+    password: Adminisgr8*
+    useSsl: true
 

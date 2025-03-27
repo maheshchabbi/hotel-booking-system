@@ -12,8 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotelSearchResponse {
-    List<HotelSearchResponseItem> hotelList;
-    Integer numResults;
-    Long minPrice;
-    Long maxPrice;
+    private List<HotelSearchResponseItem> hotelList;
+    private Integer numResults;
+    private Long minPrice;
+    private Long maxPrice;
 }
+

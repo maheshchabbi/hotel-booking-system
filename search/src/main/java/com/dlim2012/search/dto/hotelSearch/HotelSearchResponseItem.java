@@ -12,19 +12,20 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HotelSearchResponseItem {
-    Integer hotelId;
-    String hotelName;
-    String propertyType;
-    String neighborhood;
-    String city;
-    String state;
-    String zipcode;
-    Double distance;
-    Integer numRoom;
-    Long totalPrice;
-    Integer maxFreeCancellationDays;
-    Integer noPrepaymentDays;
-    Boolean breakfast;
-    List<HotelSearchRooms> roomsList;
-    Double score;
+    private Integer hotelId;
+    private String hotelName;
+    private String propertyType;
+    private String neighborhood;
+    private String city;
+    private String state;
+    private String zipcode;
+    private Double distance;
+    private Integer numRoom;
+    private Long totalPrice;
+    private Integer maxFreeCancellationDays;
+    private Integer noPrepaymentDays;
+    private Boolean breakfast;
+    private List<HotelSearchRooms> roomsList;
+    private Double score;
 }
+

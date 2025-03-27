@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,23 +37,13 @@ public class SearchController {
     @PostMapping("/hotel")
     public ResponseEntity<HotelSearchResponse> searchHotel(@RequestBody @Valid HotelSearchRequest hotelSearchRequest) {
         log.info("Hotel search requested.");
-        try {
-            return ResponseEntity.ok(searchService.search(hotelSearchRequest));
-        } catch (IOException e) {
-            log.error("Error occurred during hotel search: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(searchService.search(hotelSearchRequest));
     }
 
     @PostMapping("/price")
     public ResponseEntity<List<PriceAggResponse>> aggPrice(@RequestBody PriceAggRequest request) {
         log.info("Price aggregation requested.");
-        try {
-            return ResponseEntity.ok(searchService.aggPrice(request));
-        } catch (IOException e) {
-            log.error("Error during price aggregation: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(searchService.aggPrice(request));
     }
 
     @PostMapping("/hotel/{hotelId}/availability")
@@ -62,33 +51,19 @@ public class SearchController {
             @PathVariable("hotelId") Integer hotelId,
             @RequestBody RoomsAvailabilityRequest request) {
         log.info("Checking availability for hotel ID: {}", hotelId);
-        try {
-            return ResponseEntity.ok(searchService.getRoomsAvailability(hotelId, request));
-        } catch (IOException e) {
-            log.error("Error checking room availability for hotel {}: {}", hotelId, e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(searchService.getRoomsAvailability(hotelId, request));
     }
 
     @PostMapping("/count/city")
     public ResponseEntity<List<NumberResponse>> numHotelByCity(@RequestBody List<NumberByCityRequest> request) {
         log.info("Counting hotels by city.");
-        try {
-            return ResponseEntity.ok(countHotelService.numHotelByCity(request));
-        } catch (IOException e) {
-            log.error("Error during hotel count by city: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(countHotelService.numHotelByCity(request));
     }
 
     @PostMapping("/count/property-type")
     public ResponseEntity<List<NumberResponse>> numHotelByPropertyType(@RequestBody List<NumberByPropertyTypeRequest> request) {
         log.info("Counting hotels by property type.");
-        try {
-            return ResponseEntity.ok(countHotelService.numHotelByPropertyType(request));
-        } catch (IOException e) {
-            log.error("Error during hotel count by property type: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(countHotelService.numHotelByPropertyType(request));
     }
 }
+

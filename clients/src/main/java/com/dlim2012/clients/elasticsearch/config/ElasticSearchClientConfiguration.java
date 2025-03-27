@@ -1,12 +1,19 @@
 package com.dlim2012.clients.elasticsearch.config;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.http.ssl.SSLContexts;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
+import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
+import org.springframework.http.HttpHeaders;
 
 import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
@@ -27,55 +34,51 @@ public class ElasticSearchClientConfiguration extends ElasticsearchConfiguration
     @Value("${custom.elasticsearch.useSsl}")
     private String useSsl;
 
-    private SSLContext createSSLContext(){
-        try{
-//            SSLContext sslContext = SSLContext.getInstance("TLS");
-//            sslContext.init(null, new TrustManager[]{new UnsafeX509ExtendedTrustManager()}, null);
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, ((x509Certificates, s) -> true))
+    private SSLContext createSSLContext() {
+        try {
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, (x509Certificates, s) -> true)
                     .build();
             return sslContext;
-//            KeyManager[] keyManagers = getKeyManagers();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new RuntimeException(e);
-        } catch (KeyStoreException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
     @Bean
+    @Override
     public ClientConfiguration clientConfiguration() {
-        if (Objects.equals(this.useSsl, "true")){
+        // Use Spring's HttpHeaders for default headers
+        HttpHeaders defaultHeaders = new HttpHeaders();
+        defaultHeaders.set("Accept", "application/json");
+        defaultHeaders.set("Content-Type", "application/json");
+
+        if (Objects.equals(this.useSsl, "true")) {
             return ClientConfiguration.builder()
                     .connectedTo(this.hostAndPort)
                     .usingSsl(createSSLContext())
+                    .withDefaultHeaders(defaultHeaders)
                     .withBasicAuth(this.username, this.password)
                     .build();
-        } else if (this.useSsl.equals("false")){
+        } else if (Objects.equals(this.useSsl, "false")) {
             return ClientConfiguration.builder()
                     .connectedTo(this.hostAndPort)
+                    .withDefaultHeaders(defaultHeaders)
                     .build();
         } else {
             throw new IllegalArgumentException("Invalid useSsl: " + this.useSsl);
         }
     }
-//
-//    @Bean(destroyMethod = "close")
-//    public RestHighLevelClient restClient() {
-//
-////        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-////        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-//
-//        RestClientBuilder builder = RestClient.builder(new HttpHost("10.0.0.110", 9103))
-////                .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
-//                .setDefaultHeaders(compatibilityHeaders());
-//
-//        return new RestHighLevelClient(builder);
-//    }
-//
-//    private Header[] compatibilityHeaders() {
-//        return new Header[]{new BasicHeader(HttpHeaders.ACCEPT, "application/vnd.elasticsearch+json;compatible-with=7"), new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/vnd.elasticsearch+json;compatible-with=7")};
-//    }
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient() {
+        // Create the high-level REST client
+        RestHighLevelClient highLevelClient = RestClients.create(clientConfiguration()).rest();
+        // Obtain the low-level client from the high-level client
+        RestClient lowLevelClient = highLevelClient.getLowLevelClient();
+        // Build the transport and ElasticsearchClient using the Jackson mapper
+        RestClientTransport transport = new RestClientTransport(lowLevelClient, new JacksonJsonpMapper());
+        return new ElasticsearchClient(transport);
+    }
 }
+

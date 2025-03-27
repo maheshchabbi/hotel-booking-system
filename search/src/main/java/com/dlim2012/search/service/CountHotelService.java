@@ -11,9 +11,8 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.Operator;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -30,41 +29,44 @@ public class CountHotelService {
     /**
      * Count hotels based on city, state, and country filters.
      *
-     * @param request NumberByCityRequest containing location filters
-     * @return NumberResponse with count of matching hotels
+     * @param request NumberByCityRequest containing location filters.
+     * @return NumberResponse with the count of matching hotels.
      */
     public NumberResponse numHotelByCity(NumberByCityRequest request) {
         try {
             CountRequest countRequest = new CountRequest("hotel");
             BoolQueryBuilder hotelBool = QueryBuilders.boolQuery();
 
-            // Match location filters
             if (request.getCountry() != null && !request.getCountry().isEmpty()) {
-                hotelBool.must(QueryBuilders.matchQuery("country", request.getCountry()).operator(Operator.AND));
+                // Assuming country is stored as a keyword for exact match
+                hotelBool.must(QueryBuilders.termQuery("country.keyword", request.getCountry()));
             }
             if (request.getState() != null && !request.getState().isEmpty()) {
-                hotelBool.must(QueryBuilders.matchQuery("state", request.getState()).operator(Operator.AND));
+                hotelBool.must(QueryBuilders.termQuery("state.keyword", request.getState()));
             }
             if (request.getCity() != null && !request.getCity().isEmpty()) {
-                hotelBool.must(QueryBuilders.matchQuery("city", request.getCity()).operator(Operator.AND));
+                // Use term query on the "city.keyword" field for an exact match.
+                hotelBool.must(QueryBuilders.termQuery("city.keyword", request.getCity()));
             }
 
             countRequest.query(hotelBool);
             CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
             log.info("Hotel count for city [{}]: {}", request.getCity(), countResponse.getCount());
 
-            return NumberResponse.builder().count((int) countResponse.getCount()).build();
+            return NumberResponse.builder()
+                    .count((int) countResponse.getCount())
+                    .build();
         } catch (IOException e) {
-            log.error("Error counting hotels for city [{}]: {}", request.getCity(), e.getMessage());
+            log.error("Error counting hotels for city [{}]: {}", request.getCity(), e.getMessage(), e);
             return NumberResponse.builder().count(0).build();
         }
     }
 
     /**
-     * Count hotels for multiple city requests.
+     * Overloaded method to process a list of city requests.
      *
-     * @param requests List of NumberByCityRequest objects
-     * @return List of NumberResponse objects with hotel counts
+     * @param requests List of NumberByCityRequest objects.
+     * @return List of NumberResponse objects.
      */
     public List<NumberResponse> numHotelByCity(List<NumberByCityRequest> requests) {
         return requests.stream()
@@ -75,20 +77,43 @@ public class CountHotelService {
     /**
      * Count hotels by property type.
      *
-     * @param request NumberByPropertyTypeRequest with property type filter
-     * @return NumberResponse with count of matching hotels
+     * @param request NumberByPropertyTypeRequest with property type filter.
+     * @return NumberResponse with count of matching hotels.
      */
     public NumberResponse numHotelByPropertyType(NumberByPropertyTypeRequest request) {
         try {
             CountRequest countRequest = new CountRequest("hotel");
-            MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("propertyTypeOrdinal",
-                    PropertyType.valueOf(request.getPropertyType()).ordinal());
+            // Option 1: If your index stores the property type as text/keyword:
+            countRequest.query(QueryBuilders.termQuery("propertyType.keyword", request.getPropertyType()));
 
-            countRequest.query(matchQuery);
+            // Option 2: If your documents store the ordinal value:
+            // int ordinal = PropertyType.valueOf(request.getPropertyType()).ordinal();
+            // countRequest.query(QueryBuilders.termQuery("propertyTypeOrdinal", ordinal));
+
             CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
             log.info("Hotel count for property type [{}]: {}", request.getPropertyType(), countResponse.getCount());
-
-            return NumberResponse.builder().count((int) countResponse.getCount()).build();
+            return NumberResponse.builder()
+                    .count((int) countResponse.getCount())
+                    .build();
         } catch (IllegalArgumentException e) {
             log.error("Invalid property type [{}]: {}", request.getPropertyType(), e.getMessage());
-            return NumberResponse.builder().count(0).bu
+            return NumberResponse.builder().count(0).build();
+        } catch (IOException e) {
+            log.error("Error counting hotels for property type [{}]: {}", request.getPropertyType(), e.getMessage(), e);
+            return NumberResponse.builder().count(0).build();
+        }
+    }
+
+    /**
+     * Overloaded method to process a list of property type requests.
+     *
+     * @param requests List of NumberByPropertyTypeRequest objects.
+     * @return List of NumberResponse objects.
+     */
+    public List<NumberResponse> numHotelByPropertyType(List<NumberByPropertyTypeRequest> requests) {
+        return requests.stream()
+                .map(this::numHotelByPropertyType)
+                .collect(Collectors.toList());
+    }
+}
+

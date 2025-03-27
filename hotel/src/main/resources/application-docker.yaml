@@ -8,7 +8,7 @@ spring:
     location: classpath:banner.txt
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:/hotel.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/hotel?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://hotel.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/hotel?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: admin
     password: maheshchabbi
   jpa:
@@ -60,4 +60,4 @@ custom:
       - HOTEL_MANAGER
   file:
     path: "data"
-    imageUrlPrefix: "http://10.0.0.110:9000/api/v1/hotel/image"
+    imageUrlPrefix: "http://hb-apigw:9000/api/v1/hotel/image"
