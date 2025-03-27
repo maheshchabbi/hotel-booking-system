@@ -1,4 +1,7 @@
+// client.js
 
+// Use the backend API URL from environment variables
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 const checkStatus = response => {
     // console.log(response)
@@ -10,6 +13,9 @@ const checkStatus = response => {
     return Promise.reject(error);
 }
 
+// Helper to prepend the API URL to the path
+const buildUrl = (path) => `${API_URL}${path}`;
+
 export const post = (path, payload) => {
     const requestOptions = {
         method: 'POST',
@@ -19,7 +25,7 @@ export const post = (path, payload) => {
         },
         body: JSON.stringify(payload)
     };
-    return fetch(path, requestOptions)
+    return fetch(buildUrl(path), requestOptions)
         .then(response => checkStatus(response));
 }
 
@@ -31,8 +37,8 @@ export const getWithJwt = (path) => {
             'Authorization': 'Bearer ' + localStorage.getItem("jwt")
         }
     };
-    return fetch(path, requestOptions)
-        .then(response => checkStatus(response))
+    return fetch(buildUrl(path), requestOptions)
+        .then(response => checkStatus(response));
 }
 
 export const postWithJwt = (path, payload) => {
@@ -45,8 +51,8 @@ export const postWithJwt = (path, payload) => {
         },
         body: JSON.stringify(payload)
     };
-    return fetch(path, requestOptions)
-        .then(response => checkStatus(response))
+    return fetch(buildUrl(path), requestOptions)
+        .then(response => checkStatus(response));
 }
 
 export const putWithJwt = (path, payload) => {
@@ -59,8 +65,8 @@ export const putWithJwt = (path, payload) => {
         },
         body: JSON.stringify(payload)
     };
-    return fetch(path, requestOptions)
-        .then(response => checkStatus(response))
+    return fetch(buildUrl(path), requestOptions)
+        .then(response => checkStatus(response));
 }
 
 export const deleteWithJwt = (path, payload) => {
@@ -73,8 +79,8 @@ export const deleteWithJwt = (path, payload) => {
         },
         body: JSON.stringify(payload)
     };
-    return fetch(path, requestOptions)
-        .then(response => checkStatus(response))
+    return fetch(buildUrl(path), requestOptions)
+        .then(response => checkStatus(response));
 }
 
 export const postImageWithJwt = (path, imageData) => {
@@ -84,12 +90,12 @@ export const postImageWithJwt = (path, imageData) => {
         method: 'POST',
         mode: 'cors',
         headers: {
-            // 'Content-Type': 'multipart/form-data',
+            // Note: Let the browser set Content-Type for FormData.
             'Authorization': 'Bearer ' + localStorage.getItem("jwt")
         },
         body: formData
     };
-    console.log(requestOptions)
-    return fetch(path, requestOptions)
-        .then(response=> checkStatus(response))
+    console.log(requestOptions);
+    return fetch(buildUrl(path), requestOptions)
+        .then(response => checkStatus(response));
 }

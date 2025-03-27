@@ -25,7 +25,7 @@ module.exports = function(app) {
     app.use(
         '/api/v1/**',
         createProxyMiddleware({
-            target: 'http://10.0.0.110:9000',
+            target: 'http://hb-apigw:9000',
             changeOrigin: true,
         })
     );
