@@ -6,8 +6,8 @@ spec:
   selector:
     app: hb-archival
   ports:
-    - port: 80
+    - port: 9004
       targetPort: 9004
-  type: LoadBalancer
+  
 
 
