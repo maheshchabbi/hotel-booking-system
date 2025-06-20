@@ -29,14 +29,13 @@ spring:
 
   data:
     cassandra:
-      keyspace-name: booking_keyspace
-      contact-points: cassandra.us-east-1.amazonaws.com
-      port: 9142
-      local-datacenter: us-east-1
-      username: YOUR_AWS_ACCESS_KEY
-      password: YOUR_AWS_SECRET_KEY
-      ssl-enabled: true
+      host:
+      port: 9042
+      contact-points: hb-cassandra
+      local-datacenter: datacenter1
+      keyspace-name: mykeyspace
       schema-action: CREATE_IF_NOT_EXISTS
+      entity-base-package: com.dlim2012.archival.entity.cassandra
 
   zipkin:
     base-url: http://hb-zipkin:9411
