@@ -59,6 +59,6 @@ custom:
     jwt:
       expire-time-in-minutes: 43200 # 10 days
   gateway: # used to generate test user
-    hotel: http://hb-apigw:9000
-    booking: http://hb-apigw:9000
-    search: http://hb-apigw:9000
+    hotel: http://hb-hotel:80
+    booking: http://hb-booking:80
+    search: http://hb-search:80
