@@ -10,7 +10,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://myeksrds-2.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/hotel?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: admin
-    password: maheshchabbi
+    password: Maheshchabbi
   jpa:
     hibernate:
       ddl-auto: update #create-drop #update
