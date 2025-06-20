@@ -8,9 +8,9 @@ spring:
     location: classpath:banner.txt
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://booking.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/booking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://myeksrds-1.cp6qemaye14q.ap-south-1.rds.amazonaws.com:3306/booking?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: admin
-    password: maheshchabbi
+    password: Maheshchabbi
   jpa:
     hibernate:
       ddl-auto: update  # Consider managing schema changes via migrations in production
@@ -26,7 +26,7 @@ spring:
       mode: always
   data:
     redis:
-      host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com  # Updated primary AWS ElastiCache endpoint
+      host: cluster-hotel.uyazel.0001.aps1.cache.amazonaws.com  # Updated primary AWS ElastiCache endpoint
       port: 6379
       timeout: 3000  # Timeout in milliseconds
       lettuce:
@@ -46,7 +46,7 @@ spring:
       - hotel-booking
       - user-booking
     redis:
-      host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com  # Updated AWS ElastiCache endpoint
+      host: cluster-hotel.uyazel.0001.aps1.cache.amazonaws.com  # Updated AWS ElastiCache endpoint
       port: 6379
       time-to-live: 10000  # Cache expiry in milliseconds
       cache-null-values: true
@@ -70,7 +70,7 @@ logging:
 
 custom:
   redis:
-    host: hotel1.uyazel.ng.0001.aps1.cache.amazonaws.com  # Updated primary AWS ElastiCache endpoint
+    host: cluster-hotel.uyazel.0001.aps1.cache.amazonaws.com  # Updated primary AWS ElastiCache endpoint
     port: 6379
   paypal:
     mode: sandbox
