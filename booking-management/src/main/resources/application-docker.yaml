@@ -81,4 +81,4 @@ custom:
     port: 6379
     time-to-live: 10000  # Cache expiry in milliseconds
     cache-null-values: true
-  gateway: "http://hb-apigw:9000"
+  #gateway: "http://hb-apigw:9000"
