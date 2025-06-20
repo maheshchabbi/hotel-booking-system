@@ -14,7 +14,7 @@ spring:
     # Use HTTPS without specifying a port (443 is the default for HTTPS)
     uris: https://search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
     username: admin
-    password: Adminisgr8*
+    password: Maheshchabbi1!
     # Optional: adjust timeouts if necessary
     connection-timeout: 5000
     socket-timeout: 30000
@@ -42,6 +42,6 @@ custom:
     server: search-hotel-r5mlvbrrpaqflefx2k6emieoje.ap-south-1.es.amazonaws.com
     port: 443         # HTTPS typically runs on 443; no need to add to the URI if using HTTPS.
     username: admin
-    password: Adminisgr8*
+    password: Maheshchabbi1!
     useSsl: true
 
