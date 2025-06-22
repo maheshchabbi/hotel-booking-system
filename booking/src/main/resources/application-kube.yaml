@@ -73,7 +73,7 @@ custom:
       id: AU3lFjUm-hpp4z8Pls4QMHeqqqpKxrt167x8At0meKHLVFbPeBBawprvPbUSehMpIU1BS6SO--beEupW
       secret: EMid4txa6eaYtjwCXWSWOi69TicrlPIR86gcFvsmexKuvK4I98vMFm8G-q6QY1_Cy3BTP6uaU0cYSw9c
     host: http://10.0.0.110:8001
-    frontend: http://ec2-35-171-6-79.compute-1.amazonaws.com
+    frontend: http://frontend-service
   security:
     rsa:
       public-key: classpath:certs/public.pem
